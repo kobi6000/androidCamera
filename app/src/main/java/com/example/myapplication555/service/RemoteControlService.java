@@ -43,13 +43,25 @@ public class RemoteControlService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Remote Control Service started");
+        boolean isAutoStart = intent != null && intent.getBooleanExtra("auto_start", false);
+        
+        if (isAutoStart) {
+            Log.i(TAG, "Remote Control Service auto-started on boot");
+        } else {
+            Log.i(TAG, "Remote Control Service started manually");
+        }
         
         // Start as foreground service
-        startForeground(NOTIFICATION_ID, createNotification());
+        startForeground(NOTIFICATION_ID, createNotification(isAutoStart));
         
         // Start HTTP server to listen for commands
-        httpServer.startServer();
+        boolean serverStarted = httpServer.startServer();
+        
+        if (serverStarted) {
+            Log.i(TAG, "HTTP server started successfully on port 8080");
+        } else {
+            Log.e(TAG, "Failed to start HTTP server");
+        }
         
         return START_STICKY; // Restart service if killed by system
     }
@@ -95,9 +107,19 @@ public class RemoteControlService extends Service {
      * Create notification for foreground service
      */
     private Notification createNotification() {
+        return createNotification(false);
+    }
+    
+    /**
+     * Create notification for foreground service with auto-start info
+     */
+    private Notification createNotification(boolean isAutoStart) {
+        String title = isAutoStart ? "🤖 Remote Control Auto-Started" : "Remote Control Active";
+        String text = isAutoStart ? "Auto-started on boot - device ready for remote control" : "Device can be controlled remotely via WiFi";
+        
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Remote Control Active")
-                .setContentText("Device can be controlled remotely via WiFi")
+                .setContentTitle(title)
+                .setContentText(text)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)

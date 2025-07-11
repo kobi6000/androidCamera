@@ -1,6 +1,7 @@
 package com.example.myapplication555;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final int REQUEST_CODE_PERMISSIONS = 123;
     
     // Required permissions for remote control functionality
-    // Note: Storage permissions are not needed on Android 15+ for app private storage
+    // Note: Boot permission is automatically granted on install
     private static final String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.CAMERA,
             Manifest.permission.INTERNET,
@@ -65,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         
         // Check and request permissions on startup
         checkPermissions();
+        
+        // Check if service is already running (auto-started)
+        checkServiceStatus();
         
         Log.i(TAG, "MainActivity created");
     }
@@ -164,6 +168,40 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     (ipAddress >> 24 & 0xff));
         }
         return "Unable to get IP";
+    }
+
+    /**
+     * Check if RemoteControlService is already running (auto-started)
+     */
+    private void checkServiceStatus() {
+        if (isServiceRunning(RemoteControlService.class)) {
+            isServiceRunning = true;
+            
+            // Show that service is already running
+            String ipAddress = getDeviceIPAddress();
+            String message = "🤖 Remote Control Auto-Started!\n\nDevice IP: " + ipAddress + ":8080\n\nTap button to STOP service.";
+            
+            Snackbar.make(binding.getRoot(), "Remote Control Running - IP: " + ipAddress + ":8080", 
+                         Snackbar.LENGTH_LONG).show();
+            
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            Log.i(TAG, "Remote control service detected running on IP: " + ipAddress + ":8080");
+        }
+    }
+
+    /**
+     * Check if a specific service is running
+     */
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        if (manager != null) {
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+                if (serviceClass.getName().equals(service.service.getClassName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     // Permission callbacks
