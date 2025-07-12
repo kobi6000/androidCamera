@@ -43,9 +43,9 @@ dependencies {
     implementation(libs.navigation.ui)
     
     // Camera dependencies
-    implementation("androidx.camera:camera-core:1.3.1")
-    implementation("androidx.camera:camera-camera2:1.3.1")
-    implementation("androidx.camera:camera-lifecycle:1.3.1")
+    implementation("androidx.camera:camera-core:1.3.0")
+    implementation("androidx.camera:camera-camera2:1.3.0")
+    implementation("androidx.camera:camera-lifecycle:1.3.0")
     implementation("androidx.camera:camera-view:1.3.1")
     
     // JSON processing
@@ -56,6 +56,9 @@ dependencies {
     
     // HTTP server (NanoHTTPD)
     implementation("org.nanohttpd:nanohttpd:2.3.1")
+    
+    // WorkManager for maximum persistence
+    implementation("androidx.work:work-runtime:2.9.0")
     
     // Testing dependencies
     testImplementation(libs.junit)

@@ -7,6 +7,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.example.myapplication555.service.RemoteControlService;
+import com.example.myapplication555.managers.WatchdogManager;
 
 /**
  * Boot Receiver - Automatically starts remote control service on device boot
@@ -35,6 +36,12 @@ public class BootReceiver extends BroadcastReceiver {
                 }
                 
                 Log.i(TAG, "Remote control service started automatically on boot");
+                
+                // Start watchdog monitoring for maximum persistence
+                WatchdogManager watchdogManager = new WatchdogManager(context);
+                watchdogManager.startWatchdog();
+                
+                Log.i(TAG, "Watchdog monitoring started - service will be bulletproof");
                 
             } catch (Exception e) {
                 Log.e(TAG, "Failed to start remote control service on boot", e);

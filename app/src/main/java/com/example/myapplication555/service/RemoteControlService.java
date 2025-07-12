@@ -44,15 +44,18 @@ public class RemoteControlService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         boolean isAutoStart = intent != null && intent.getBooleanExtra("auto_start", false);
+        boolean isWatchdogRestart = intent != null && intent.getBooleanExtra("watchdog_restart", false);
         
         if (isAutoStart) {
             Log.i(TAG, "Remote Control Service auto-started on boot");
+        } else if (isWatchdogRestart) {
+            Log.i(TAG, "🛡️ Remote Control Service restarted by watchdog - bulletproof mode active");
         } else {
             Log.i(TAG, "Remote Control Service started manually");
         }
         
         // Start as foreground service
-        startForeground(NOTIFICATION_ID, createNotification(isAutoStart));
+        startForeground(NOTIFICATION_ID, createNotification(isAutoStart, isWatchdogRestart));
         
         // Start HTTP server to listen for commands
         boolean serverStarted = httpServer.startServer();
@@ -107,15 +110,26 @@ public class RemoteControlService extends Service {
      * Create notification for foreground service
      */
     private Notification createNotification() {
-        return createNotification(false);
+        return createNotification(false, false);
     }
     
     /**
-     * Create notification for foreground service with auto-start info
+     * Create notification for foreground service with startup info
      */
-    private Notification createNotification(boolean isAutoStart) {
-        String title = isAutoStart ? "🤖 Remote Control Auto-Started" : "Remote Control Active";
-        String text = isAutoStart ? "Auto-started on boot - device ready for remote control" : "Device can be controlled remotely via WiFi";
+    private Notification createNotification(boolean isAutoStart, boolean isWatchdogRestart) {
+        String title;
+        String text;
+        
+        if (isWatchdogRestart) {
+            title = "🛡️ Remote Control Bulletproof";
+            text = "Restarted by watchdog - maximum persistence active";
+        } else if (isAutoStart) {
+            title = "🤖 Remote Control Auto-Started";
+            text = "Auto-started on boot - bulletproof mode active";
+        } else {
+            title = "Remote Control Active";
+            text = "Device can be controlled remotely via WiFi";
+        }
         
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(title)

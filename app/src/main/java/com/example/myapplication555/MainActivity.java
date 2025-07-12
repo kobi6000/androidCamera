@@ -20,6 +20,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.myapplication555.databinding.ActivityMainBinding;
 import com.example.myapplication555.service.RemoteControlService;
+import com.example.myapplication555.managers.WatchdogManager;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private boolean isServiceRunning = false;
+    private WatchdogManager watchdogManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         // Start/Stop Remote Control Service
         binding.fab.setOnClickListener(this::toggleRemoteControlService);
+        
+        // Initialize watchdog manager for maximum persistence
+        watchdogManager = new WatchdogManager(this);
         
         // Check and request permissions on startup
         checkPermissions();
@@ -102,15 +107,18 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         
         isServiceRunning = true;
         
+        // Start watchdog for maximum persistence
+        watchdogManager.startWatchdog();
+        
         // Show device IP address for remote connection
         String ipAddress = getDeviceIPAddress();
-        String message = "✅ Remote Control Started!\n\nDevice IP: " + ipAddress + ":8080\n\nUse this IP in your Python control app.";
+        String message = "✅ Remote Control Started!\n\nDevice IP: " + ipAddress + ":8080\n\n🛡️ BULLETPROOF MODE: Watchdog monitoring active\n\nUse this IP in your Python control app.";
         
-        Snackbar.make(binding.getRoot(), "Remote Control Started - IP: " + ipAddress + ":8080", 
+        Snackbar.make(binding.getRoot(), "Remote Control Started - IP: " + ipAddress + ":8080 (Bulletproof)", 
                      Snackbar.LENGTH_LONG).show();
         
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        Log.i(TAG, "Remote control service started on IP: " + ipAddress + ":8080");
+        Log.i(TAG, "Remote control service started on IP: " + ipAddress + ":8080 with watchdog monitoring");
     }
 
     /**
@@ -120,10 +128,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         Intent serviceIntent = new Intent(this, RemoteControlService.class);
         stopService(serviceIntent);
         
+        // Stop watchdog monitoring
+        watchdogManager.stopWatchdog();
+        
         isServiceRunning = false;
         
-        Snackbar.make(binding.getRoot(), "Remote Control Stopped", Snackbar.LENGTH_SHORT).show();
-        Log.i(TAG, "Remote control service stopped");
+        Snackbar.make(binding.getRoot(), "Remote Control Stopped (Watchdog Disabled)", Snackbar.LENGTH_SHORT).show();
+        Log.i(TAG, "Remote control service stopped and watchdog disabled");
     }
 
     /**
@@ -179,13 +190,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             
             // Show that service is already running
             String ipAddress = getDeviceIPAddress();
-            String message = "🤖 Remote Control Auto-Started!\n\nDevice IP: " + ipAddress + ":8080\n\nTap button to STOP service.";
+            String message = "🤖 Remote Control Auto-Started!\n\nDevice IP: " + ipAddress + ":8080\n\n🛡️ BULLETPROOF MODE: Watchdog monitoring active\n\nTap button to STOP service.";
             
-            Snackbar.make(binding.getRoot(), "Remote Control Running - IP: " + ipAddress + ":8080", 
+            Snackbar.make(binding.getRoot(), "Remote Control Running - IP: " + ipAddress + ":8080 (Bulletproof)", 
                          Snackbar.LENGTH_LONG).show();
             
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-            Log.i(TAG, "Remote control service detected running on IP: " + ipAddress + ":8080");
+            Log.i(TAG, "Remote control service detected running on IP: " + ipAddress + ":8080 with watchdog monitoring");
         }
     }
 
