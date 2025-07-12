@@ -5,10 +5,11 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final int REQUEST_CODE_PERMISSIONS = 123;
     
     // Required permissions for remote control functionality
-    // Note: Storage permissions are not needed on Android 15+ for app private storage
     private static final String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.CAMERA,
             Manifest.permission.INTERNET,
@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private boolean isServiceRunning = false;
+    private FirstFragment firstFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +61,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        // Start/Stop Remote Control Service
-        binding.fab.setOnClickListener(this::toggleRemoteControlService);
-        
         // Check and request permissions on startup
         checkPermissions();
         
@@ -70,9 +68,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     /**
-     * Toggle remote control service on/off
+     * Set reference to FirstFragment
      */
-    private void toggleRemoteControlService(View view) {
+    public void setFirstFragment(FirstFragment fragment) {
+        this.firstFragment = fragment;
+    }
+
+    /**
+     * Toggle remote control service from fragment
+     */
+    public void toggleRemoteControlFromFragment() {
         if (hasAllPermissions()) {
             if (!isServiceRunning) {
                 startRemoteControlService();
@@ -88,6 +93,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * Start the remote control service
      */
     private void startRemoteControlService() {
+        // Update UI to pending state
+        updateFragmentStatusToPending();
+        
         Intent serviceIntent = new Intent(this, RemoteControlService.class);
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -107,6 +115,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         Log.i(TAG, "Remote control service started on IP: " + ipAddress + ":8080");
+        
+        // Update fragment UI with slight delay to ensure UI is ready
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            updateFragmentStatus(true, ipAddress);
+        }, 100);
     }
 
     /**
@@ -120,6 +133,28 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         
         Snackbar.make(binding.getRoot(), "Remote Control Stopped", Snackbar.LENGTH_SHORT).show();
         Log.i(TAG, "Remote control service stopped");
+        
+        // Update fragment UI
+        updateFragmentStatus(false, "");
+    }
+
+    /**
+     * Update the FirstFragment status display
+     */
+    private void updateFragmentStatus(boolean isRunning, String ipAddress) {
+        if (firstFragment != null) {
+            firstFragment.updateRemoteControlStatus(isRunning, ipAddress);
+            firstFragment.enableControlButton();
+        }
+    }
+
+    /**
+     * Update the FirstFragment to pending status
+     */
+    private void updateFragmentStatusToPending() {
+        if (firstFragment != null) {
+            firstFragment.updateStatusToPending();
+        }
     }
 
     /**
@@ -135,6 +170,23 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private void checkPermissions() {
         if (!hasAllPermissions()) {
             requestPermissions();
+        } else {
+            // Auto-start remote control if permissions are already granted
+            autoStartRemoteControl();
+        }
+    }
+
+    /**
+     * Auto-start remote control service when app opens
+     */
+    private void autoStartRemoteControl() {
+        // Start remote control service automatically when app opens
+        if (!isServiceRunning) {
+            Log.i(TAG, "Auto-starting remote control service");
+            // Add delay to ensure UI is ready
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                startRemoteControlService();
+            }, 500);
         }
     }
 
@@ -170,7 +222,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         Log.d(TAG, "Permissions granted: " + perms);
-        Toast.makeText(this, "Permissions granted! You can now start remote control.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Permissions granted! Starting remote control...", Toast.LENGTH_SHORT).show();
+        
+        // Auto-start remote control after permissions are granted
+        autoStartRemoteControl();
     }
 
     @Override
