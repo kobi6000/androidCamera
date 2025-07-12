@@ -50,11 +50,11 @@ public class PropertyController {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = reader.readLine();
             
-            // Wait for process to complete with timeout
-            boolean finished = process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            // Wait for process to complete with timeout (API-safe version)
+            boolean finished = waitForProcess(process, TIMEOUT_SECONDS);
             if (!finished) {
                 Log.e(TAG, "getprop command timed out for property: " + property);
-                process.destroyForcibly();
+                destroyProcess(process);
                 return null;
             }
             
@@ -78,6 +78,46 @@ public class PropertyController {
         } catch (Exception e) {
             Log.e(TAG, "Unexpected error getting property: " + property, e);
             return null;
+        }
+    }
+
+    /**
+     * API-safe process wait with timeout
+     * Compatible with API 24+
+     */
+    private boolean waitForProcess(Process process, int timeoutSeconds) throws InterruptedException {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            // API 26+: Use built-in timeout
+            return process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
+        } else {
+            // API 24-25: Manual timeout implementation
+            long startTime = System.currentTimeMillis();
+            long timeoutMillis = timeoutSeconds * 1000L;
+            
+            while (System.currentTimeMillis() - startTime < timeoutMillis) {
+                try {
+                    process.exitValue(); // This throws IllegalThreadStateException if process is still running
+                    return true; // Process finished
+                } catch (IllegalThreadStateException e) {
+                    // Process still running, wait a bit
+                    Thread.sleep(100);
+                }
+            }
+            return false; // Timeout reached
+        }
+    }
+
+    /**
+     * API-safe process destroy
+     * Compatible with API 24+
+     */
+    private void destroyProcess(Process process) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            // API 26+: Use destroyForcibly for immediate termination
+            process.destroyForcibly();
+        } else {
+            // API 24-25: Use regular destroy
+            process.destroy();
         }
     }
 
@@ -157,10 +197,10 @@ public class PropertyController {
                 result.append(line).append("\n");
             }
             
-            boolean finished = process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            boolean finished = waitForProcess(process, TIMEOUT_SECONDS);
             if (!finished) {
                 Log.e(TAG, "getprop category command timed out");
-                process.destroyForcibly();
+                destroyProcess(process);
                 return null;
             }
             
@@ -202,7 +242,7 @@ public class PropertyController {
     public boolean isGetPropAvailable() {
         try {
             Process process = Runtime.getRuntime().exec(new String[]{"which", "getprop"});
-            boolean finished = process.waitFor(5, TimeUnit.SECONDS);
+            boolean finished = waitForProcess(process, 5);
             
             if (finished && process.exitValue() == 0) {
                 Log.d(TAG, "getprop command is available");
@@ -236,10 +276,10 @@ public class PropertyController {
                 result.append(line).append("\n");
             }
             
-            boolean finished = process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            boolean finished = waitForProcess(process, TIMEOUT_SECONDS);
             if (!finished) {
                 Log.e(TAG, "getprop all properties command timed out");
-                process.destroyForcibly();
+                destroyProcess(process);
                 return null;
             }
             

