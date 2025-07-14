@@ -1,11 +1,41 @@
 <resources>
-    <string name="app_name">My Application555</string>
+    <string name="app_name">Remote Control</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="first_fragment_label">Remote Control</string>
+    <string name="second_fragment_label">About</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+
+    <!-- Remote Control Center strings -->
+    <string name="remote_control_center">Remote Control Center</string>
+    <string name="wireless_device_control">Wireless device control made easy</string>
+    <string name="status_active">ACTIVE</string>
+    <string name="status_inactive">INACTIVE</string>
+    <string name="status_label">Status:</string>
+    <string name="obtaining_ip">Obtaining IP…Device IP Address</string>
+    <string name="device_ip_address">Device IP Address</string>
+    <string name="use_this_ip">Use this IP address to connect from your control device</string>
+    <string name="start_remote_control">START REMOTE CONTROL</string>
+    <string name="stop_remote_control">STOP REMOTE CONTROL</string>
+    <string name="welcome_message">Welcome to Remote Control Hub!</string>
+    <string name="ready_message">Your device is ready to be controlled remotely via WiFi.</string>
+    <string name="about">About</string>
+    <string name="back">Back</string>
+    
+    <!-- About screen strings -->
+    <string name="about_description">Remote Control Hub allows you to control your Android device wirelessly from another device on the same network.</string>
+    <string name="features_title">Features:</string>
+    <string name="feature_camera">📷 Camera Control - Open camera and take pictures remotely</string>
+    <string name="feature_properties">📱 Device Properties - Query device information</string>
+    <string name="feature_wifi">🌐 WiFi Based - Works over your local network</string>
+    <string name="feature_secure">🔒 Secure - Only accessible from your local network</string>
+    <string name="usage_title">To use this app:</string>
+    <string name="usage_step1">1. Make sure both devices are on the same WiFi network</string>
+    <string name="usage_step2">2. Start the remote control service</string>
+    <string name="usage_step3">3. Note the IP address shown</string>
+    <string name="usage_step4">4. Use the Python control script with this IP address</string>
+    <string name="about_footer">The service will run in the background and show a notification when active. You can control the camera, take pictures, and query device properties remotely.</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

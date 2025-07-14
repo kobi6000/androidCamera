@@ -2,4 +2,13 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primary_blue">#4285F4</color>
+    <color name="dark_background">#1A1A2E</color>
+    <color name="card_background">#16213E</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="success_green">#4CAF50</color>
+    <color name="inactive_red">#F44336</color>
+    <color name="button_active">#4285F4</color>
+    <color name="button_inactive">#F44336</color>
 </resources>
