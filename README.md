@@ -86,8 +86,8 @@ A comprehensive Android application that can be controlled remotely via WiFi to 
 
 3. **Grant Permissions**
    - Launch the app
-   - Grant camera, storage, and network permissions when prompted
-   - Tap the floating action button to start remote control service
+   - Grant camera   [and  storage, and network if asks ] permissions when prompted
+   - The app should automatically start the remote control. If it doesn't, click the 'Start Remote Control' button.
 
 4. **Note the IP Address**
    - The app will display the device IP address
