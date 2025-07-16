@@ -2,4 +2,40 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Cool futuristic color palette -->
+    <color name="primary_blue">#0A84FF</color>
+    <color name="primary_purple">#6C5CE7</color>
+    <color name="primary_cyan">#00D4FF</color>
+    <color name="primary_green">#00FF88</color>
+    
+    <color name="dark_background">#0F0F23</color>
+    <color name="dark_surface">#1A1A3A</color>
+    <color name="dark_surface_variant">#2D2D5A</color>
+    
+    <color name="light_background">#F8F9FA</color>
+    <color name="light_surface">#FFFFFF</color>
+    <color name="light_surface_variant">#E9ECEF</color>
+    
+    <color name="accent_orange">#FF6B35</color>
+    <color name="accent_pink">#FF3E8C</color>
+    <color name="accent_gold">#FFD700</color>
+    
+    <color name="success_green">#00FF88</color>
+    <color name="warning_orange">#FF9500</color>
+    <color name="error_red">#FF3B30</color>
+    
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A0A0A0</color>
+    <color name="text_tertiary">#6C6C6C</color>
+    
+    <color name="gradient_start">#6C5CE7</color>
+    <color name="gradient_end">#00D4FF</color>
+    
+    <color name="card_background">#1E1E3F</color>
+    <color name="card_border">#3A3A6B</color>
+    
+    <color name="status_running">#00FF88</color>
+    <color name="status_stopped">#FF3B30</color>
+    <color name="status_pending">#FF9500</color>
 </resources>

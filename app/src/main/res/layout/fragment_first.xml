@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_background"
     tools:context=".FirstFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -11,25 +12,174 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
+        <!-- Title Section -->
+        <TextView
+            android:id="@+id/title_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/remote_control_title"
+            android:textColor="@color/text_primary"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/subtitle_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/remote_control_subtitle"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/title_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Status Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/status_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginHorizontal="16dp"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="12dp"
+            app:strokeColor="@color/card_border"
+            app:strokeWidth="1dp"
+            app:layout_constraintTop_toBottomOf="@id/subtitle_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Status Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Status:"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/status_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/status_stopped"
+                        android:textColor="@color/status_stopped"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- IP Address Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/device_ip_label"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/ip_address_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/device_ip_unknown"
+                        android:textColor="@color/primary_cyan"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace" />
+
+                </LinearLayout>
+
+                <!-- Connection Info -->
+                <TextView
+                    android:id="@+id/connection_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/use_this_ip"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="14sp"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Control Button -->
+        <Button
+            android:id="@+id/control_button"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginHorizontal="32dp"
+            android:text="@string/remote_control_button_start"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:background="@drawable/cool_button_background"
+            android:elevation="8dp"
+            android:translationZ="4dp"
+            app:layout_constraintTop_toBottomOf="@id/status_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Welcome Message -->
+        <TextView
+            android:id="@+id/welcome_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/welcome_message"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginTop="32dp"
+            android:layout_marginHorizontal="16dp"
+            app:layout_constraintTop_toBottomOf="@id/control_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Info Button -->
         <Button
             android:id="@+id/button_first"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/next"
-            app:layout_constraintBottom_toTopOf="@id/textview_first"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/primary_cyan"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="24dp"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
+            app:layout_constraintTop_toBottomOf="@id/welcome_message"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-        <TextView
-            android:id="@+id/textview_first"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/lorem_ipsum"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/button_first" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

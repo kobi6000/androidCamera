@@ -1,9 +1,63 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.MyApplication555" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Primary Colors -->
+        <item name="colorPrimary">@color/primary_blue</item>
+        <item name="colorPrimaryVariant">@color/primary_purple</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <!-- Secondary Colors -->
+        <item name="colorSecondary">@color/primary_cyan</item>
+        <item name="colorSecondaryVariant">@color/primary_green</item>
+        <item name="colorOnSecondary">@color/dark_background</item>
+        
+        <!-- Surface Colors -->
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/dark_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        
+        <!-- Background -->
+        <item name="android:colorBackground">@color/dark_background</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        
+        <!-- Error Colors -->
+        <item name="colorError">@color/error_red</item>
+        <item name="colorOnError">@color/white</item>
+        
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/dark_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        
+        <!-- Navigation bar -->
+        <item name="android:navigationBarColor">@color/dark_background</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        
+        <!-- Window -->
+        <item name="android:windowBackground">@color/dark_background</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="Theme.MyApplication555" parent="Base.Theme.MyApplication555" />
+    
+    <!-- Cool button styles -->
+    <style name="CoolButton" parent="Widget.Material3.Button">
+        <item name="android:background">@drawable/cool_button_background</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingHorizontal">24dp</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:elevation">8dp</item>
+        <item name="android:translationZ">4dp</item>
+    </style>
+    
+    <!-- Status card style -->
+    <style name="StatusCard">
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">12dp</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="contentPadding">24dp</item>
+    </style>
 </resources>
