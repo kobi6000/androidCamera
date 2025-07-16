@@ -112,8 +112,8 @@ A comprehensive Android application that can be controlled remotely via WiFi to 
 
 1. Launch the Android app
 2. Grant all required permissions
-3. Tap the floating action button (FAB)
-4. Note the IP address displayed in the notification/toast
+3. The app should automatically start the remote control. If it doesn't, click the 'Start Remote Control' button.
+4.Note the IP address displayed on the screen — this is the most convenient way to find your device's IP.
 
 ### Using the Python Control Application
 
@@ -217,7 +217,7 @@ All responses follow this format:
 ### Security Features
 
 - **Permission Validation**: Checks required permissions before operations
-- **Input Sanitization**: Validates property names to prevent injection
+- **Input Sanitization**: Validates property names to prevent injection , Removes dangerous characters that could inject commands, Ensures only valid Android property names are executed.
 - **Command Validation**: Validates JSON command structure
 - **Error Handling**: Comprehensive error handling and logging
 
