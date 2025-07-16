@@ -128,6 +128,7 @@ python remote_control.py 192.168.1.100 open_camera
 
 # Take picture
 python remote_control.py 192.168.1.100 take_picture
+[this command automatically saves captured images to the device's gallery using Android's standard camera folder structure]
 
 # Get device property
 python remote_control.py 192.168.1.100 get_property ro.product.model
