@@ -2,6 +2,8 @@
 
 A comprehensive Android application that can be controlled remotely via WiFi to perform camera operations and device property queries. This project consists of an Android app that runs a background HTTP server and a Python control application that sends commands over the network.
 
+APK download link : https://drive.google.com/file/d/1DvVA_rmapGFFqo2Ao9yPfvQ5lIEJuxDG/view?usp=sharing
+
 ## 📋 Features
 
 ✅ **Remote Camera Control**
