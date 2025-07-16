@@ -330,20 +330,4 @@ Potential improvements for future versions:
 - **WebSocket**: Real-time communication
 - **Device Discovery**: Automatic device discovery on network
 
-## 📄 License
-
-This project is developed as a demonstration of Android remote control capabilities. Use responsibly and in accordance with applicable laws and regulations.
-
-## 👥 Contributing
-
-This application follows clean code principles and modular architecture. When contributing:
-
-1. Maintain the existing code style
-2. Add comprehensive documentation
-3. Include error handling
-4. Test on real devices
-5. Update this README if needed
-
----
-
-**Note**: This application is designed for educational and development purposes. Always ensure you have permission to remotely control devices and comply with applicable privacy and security regulations. 
+ 
