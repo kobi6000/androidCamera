@@ -423,7 +423,7 @@ more optional information:
 
 
 
- ## 🚀 **How to Successfully Send Remote Control Commands from Clean Windows (Without Android Studio)**
+ ## 🚀 **How to Successfully Send Remote Control Commands from Clean Windows/Max/Linux terminal (Without Android Studio)**
 
 ### **Minimum Setup for Remote Control from Windows:**
 
