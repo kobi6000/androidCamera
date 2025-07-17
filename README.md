@@ -586,7 +586,7 @@ more optional information:
 ### **Minimum Setup for Remote Control from Windows:**
 
 1. **Install Python** (from python.org)
-2. **Install requests** (`pip install requests`)
+2. **Install requests** (`pip install requests` or 'python -m pip install requests')
 3. **Copy remote_control.py** to Windows
 4. **Run commands** to control your Android device
 
@@ -603,7 +603,7 @@ python --version
 
 ## 📦 **Step 2: Install Requests Library**
 # Open Command Prompt as Administrator
-pip install requests
+pip install requests or python -m pip install requests 
 
 
 ## 📁 **Step 3: Get the Python Script**
