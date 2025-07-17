@@ -570,8 +570,6 @@ Python Side:
 
 
 more optional information:
-#####@@@@@@@@@@#####@@@@@@@@@@#####@@@@@@@@@@
-
 
 
  ## 🚀 **How to Successfully Send Remote Control Commands from Clean Windows/Max/Linux terminal (Without Android Studio)**
