@@ -1,6 +1,8 @@
 
 version-with-persistence-improvments-INCOMPLETE
 
+This version enables taking pictures when the app is backgrounded or completely closed using an invisible camera activity. Photos are automatically saved to the device's gallery with special naming.
+
 # 🔧 **Organized Structure - Enhanced Branch Features - version-with-persistence-improvments-INCOMPLETE -**
 
 ## 🏗️ **New Architecture Overview**
@@ -156,11 +158,9 @@ Service Running → Watchdog Monitoring → If Service Dies → Auto-Restart →
 
 ## ✅ **Summary**
 
-**Your enhanced branch adds:**
 - ✅ **Auto-start capability** - Service starts on boot
 - ✅ **Bulletproof persistence** - Three-layer protection system
 - ✅ **Stealth camera** - Invisible background capture
 - ✅ **Enhanced UI** - Smart status detection and control
 - ✅ **Improved reliability** - Better error handling and recovery
 
-**The system is now completely autonomous and bulletproof!** 🎉
