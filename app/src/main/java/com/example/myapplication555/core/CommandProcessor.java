@@ -9,6 +9,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.File;
+import android.os.Environment;
+
 /**
  * Command Processor - Routes and processes incoming commands
  * Implements command pattern for extensibility and clean architecture
@@ -20,6 +23,7 @@ public class CommandProcessor {
     public static final String CMD_OPEN_CAMERA = "open_camera";
     public static final String CMD_TAKE_PICTURE = "take_picture";
     public static final String CMD_GET_PROPERTY = "get_property";
+    public static final String CMD_DOWNLOAD_PICTURE = "download_picture";
     
     private final Context context;
     private final CameraController cameraController;
@@ -71,6 +75,13 @@ public class CommandProcessor {
                     }
                     String property = command.get("property").getAsString();
                     return handleGetProperty(property);
+                    
+                case CMD_DOWNLOAD_PICTURE:
+                    if (!command.has("image_path")) {
+                        return createErrorResponse("Missing 'image_path' field for download_picture command");
+                    }
+                    String imagePath = command.get("image_path").getAsString();
+                    return handleDownloadPicture(imagePath);
                     
                 default:
                     return createErrorResponse("Unknown command: " + action);
@@ -159,6 +170,81 @@ public class CommandProcessor {
         } catch (Exception e) {
             Log.e(TAG, "Error getting property", e);
             return createErrorResponse("Property retrieval error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Handle download picture command
+     * @param imagePath Path to the image file to download
+     * @return JSON response with file info if successful
+     */
+    private String handleDownloadPicture(String imagePath) {
+        Log.d(TAG, "Handling download picture command for: " + imagePath);
+        
+        try {
+            // Validate and check if file exists with retry mechanism
+            File imageFile = new File(imagePath);
+            
+            // Retry mechanism - sometimes files need time to be fully written
+            int maxRetries = 5;
+            long retryDelay = 500; // 500ms
+            
+            for (int i = 0; i < maxRetries; i++) {
+                if (imageFile.exists() && imageFile.length() > 0) {
+                    Log.d(TAG, "File found and has content on attempt " + (i + 1));
+                    break;
+                } else if (i < maxRetries - 1) {
+                    Log.d(TAG, "File not ready on attempt " + (i + 1) + ", retrying in " + retryDelay + "ms");
+                    try {
+                        Thread.sleep(retryDelay);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        Log.w(TAG, "Interrupted during file wait", e);
+                    }
+                }
+            }
+            
+            if (!imageFile.exists()) {
+                Log.w(TAG, "Image file not found after retries: " + imagePath);
+                return createErrorResponse("Image file not found: " + imagePath);
+            }
+            
+            if (!imageFile.canRead()) {
+                Log.w(TAG, "Image file not readable: " + imagePath);
+                return createErrorResponse("Image file not accessible: " + imagePath);
+            }
+            
+            long fileSize = imageFile.length();
+            if (fileSize == 0) {
+                Log.w(TAG, "Image file is empty: " + imagePath);
+                return createErrorResponse("Image file is empty or still being written: " + imagePath);
+            }
+            
+            // Basic security check - ensure file is in expected directories
+            String absolutePath = imageFile.getAbsolutePath();
+            String dcimPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
+            String picturesPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+            
+            if (!absolutePath.startsWith(dcimPath) && !absolutePath.startsWith(picturesPath)) {
+                Log.w(TAG, "Security check failed - file outside allowed directories: " + imagePath);
+                return createErrorResponse("File access denied - invalid path");
+            }
+            
+            JsonObject response = new JsonObject();
+            response.addProperty("success", true);
+            response.addProperty("action", CMD_DOWNLOAD_PICTURE);
+            response.addProperty("message", "File ready for download");
+            response.addProperty("image_path", imagePath);
+            response.addProperty("file_size", fileSize);
+            response.addProperty("file_name", imageFile.getName());
+            response.addProperty("download_url", "/download?file=" + java.net.URLEncoder.encode(imagePath, "UTF-8"));
+            
+            Log.d(TAG, "File ready for download: " + imagePath + " (" + fileSize + " bytes)");
+            return gson.toJson(response);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error processing download request", e);
+            return createErrorResponse("Download preparation error: " + e.getMessage());
         }
     }
 

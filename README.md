@@ -135,6 +135,12 @@ python remote_control.py 192.168.1.100 get_property ro.product.model
 
 # Get device info
 python remote_control.py 192.168.1.100 device_info
+
+# Download a picture from device to Mac
+python remote_control.py 192.168.1.100 download_picture "/storage/emulated/0/DCIM/Camera/IMG_20241215_143022_123.jpg"
+
+# Take picture and download it immediately
+python remote_control.py 192.168.1.100 take_and_download
 ```
 
 #### Interactive Mode
@@ -148,6 +154,8 @@ python remote_control.py 192.168.1.100 interactive
 📱 Command: status
 📱 Command: open_camera
 📱 Command: take_picture
+📱 Command: download_picture "/path/to/image.jpg"
+📱 Command: take_and_download
 📱 Command: get_property ro.product.model
 📱 Command: device_info
 📱 Command: exit
@@ -189,6 +197,11 @@ All commands are sent as JSON POST requests:
 3. **Get Property**
    ```json
    {"action": "get_property", "property": "ro.product.model"}
+   ```
+
+4. **Download Picture**
+   ```json
+   {"action": "download_picture", "image_path": "/storage/emulated/0/DCIM/Camera/IMG_20241215_143022_123.jpg"}
    ```
 
 ### Response Format
@@ -468,6 +481,13 @@ C:\android_remote> python remote_control.py 10.100.102.126 status:
 📥 Response: {"success": true, "message": "Server is running"}
 ✅ Server is running
 ```
+
+## 📁 File Handling
+
+- **Auto-naming**: If you don't specify a save path, files are automatically named with timestamps
+- **Desktop location**: Downloaded images are saved to your desktop by default
+- **Size verification**: Downloads are verified to ensure complete transfer
+- **Progress feedback**: Clear status messages throughout the process
 
 ## ❌ **What You DON'T Need**
 - ❌ Android Studio

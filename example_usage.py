@@ -63,10 +63,24 @@ def main():
             print("📸 Picture taken successfully!")
             if "image_path" in picture_result:
                 print(f"📁 Image saved to: {picture_result['image_path']}")
+            
+            # Example 5.1: Download the picture we just took
+            print("\n📋 Example 5.1: Downloading Picture")
+            download_result = controller.download_picture(picture_result['image_path'])
+            if download_result.get("success"):
+                print(f"✅ Image downloaded to: {download_result.get('local_path')}")
+            else:
+                print("❌ Failed to download image")
+                
+        # Example 5.2: Demonstrate take_and_download
+        print("\n📋 Example 5.2: Take and Download Combined")
+        combined_result = controller.take_and_download_picture()
+        if combined_result.get("success"):
+            print(f"✅ Picture taken and downloaded to: {combined_result.get('local_path')}")
         else:
-            print("❌ Failed to take picture")
+            print("❌ Failed to take and download picture")
     else:
-        print("❌ Failed to open camera")
+        print("❌ Failed to take picture")
     
     # Example 6: Get multiple properties
     print("\n📋 Example 6: Getting Multiple Properties")
@@ -90,6 +104,8 @@ def main():
     print("   - Use interactive mode: python remote_control.py {} interactive".format(DEVICE_IP))
     print("   - Check server status: python remote_control.py {} status".format(DEVICE_IP))
     print("   - Take quick picture: python remote_control.py {} take_picture".format(DEVICE_IP))
+    print("   - Take and download: python remote_control.py {} take_and_download".format(DEVICE_IP))
+    print("   - Download existing: python remote_control.py {} download_picture \"/path/to/image.jpg\"".format(DEVICE_IP))
 
 if __name__ == "__main__":
     main() 
