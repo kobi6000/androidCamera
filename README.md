@@ -10,6 +10,7 @@ APK download link : https://drive.google.com/file/d/1yIF1K8_NcAdufCAYx3FeD1G1yGx
 - Open camera application remotely
 - Take pictures with rear camera only
 - Automatic image saving with timestamps
+- **Take and download pictures directly to desktop in one command**
 
 ✅ **Device Property Access**
 - Retrieve device properties using `getprop` command
@@ -27,6 +28,12 @@ APK download link : https://drive.google.com/file/d/1yIF1K8_NcAdufCAYx3FeD1G1yGx
 - Service-based architecture for background operations
 - Proper error handling and logging
 - Extensible command system
+
+✅ **File Transfer & Download**
+- Download captured images from Android device to control computer
+- Automatic desktop save location with timestamp naming
+- One-command picture capture and download functionality
+- Progress tracking and file verification during transfer
 
 ## 🏗️ Architecture
 
@@ -190,17 +197,18 @@ RemoteControlService → Creates CommandProcessor → Starts HttpServerManager �
 
 ### **Step 3: User Runs Python Command**
 ```
-User types: python remote_control.py 192.168.1.100 take_picture
+User types: python remote_control.py 10.100.102.126 take_and_download
 ```
 
-### **Step 4: Network Communication**
+### **Step 4: Network Communication & File Transfer**
 ```
 remote_control.py → HTTP POST → HttpServerManager → CommandProcessor → CameraController → Takes picture
+Android saves image → Python downloads file → Auto-saves to desktop
 ```
 
 ### **Step 5: Response Flow**
 ```
-CameraController → CommandProcessor → HttpServerManager → HTTP Response → remote_control.py → User sees result
+CameraController → CommandProcessor → HttpServerManager → HTTP Response → remote_control.py → Download to desktop → User sees result
 ```
 
 ## 🎯 **Key Relationships**
@@ -292,8 +300,9 @@ python remote_control.py 192.168.1.100 device_info
 # Download a picture from device to Mac
 python remote_control.py 192.168.1.100 download_picture "/storage/emulated/0/DCIM/Camera/IMG_20241215_143022_123.jpg"
 
-# Take picture and download it immediately
+# Take picture and download it immediately to desktop
 python remote_control.py 192.168.1.100 take_and_download
+[this command captures a photo on the Android device AND automatically downloads it to your Mac/Windows desktop with timestamp naming like "downloaded_20241215_143022_IMG_xxx.jpg"]
 ```
 
 #### Interactive Mode
@@ -308,7 +317,7 @@ python remote_control.py 192.168.1.100 interactive
 📱 Command: open_camera
 📱 Command: take_picture
 📱 Command: download_picture "/path/to/image.jpg"
-📱 Command: take_and_download
+📱 Command: take_and_download          [captures photo + downloads to desktop automatically]
 📱 Command: get_property ro.product.model
 📱 Command: device_info
 📱 Command: exit
@@ -355,6 +364,11 @@ All commands are sent as JSON POST requests:
 4. **Download Picture**
    ```json
    {"action": "download_picture", "image_path": "/storage/emulated/0/DCIM/Camera/IMG_20241215_143022_123.jpg"}
+   ```
+
+5. **Take and Download Picture** (Captures photo + downloads to desktop in one command)
+   ```json
+   {"action": "take_and_download"}
    ```
 
 ### Response Format
@@ -419,6 +433,12 @@ All responses follow this format:
 - **Features**: Command line and interactive modes
 - **Network**: HTTP client with proper error handling
 - **User-Friendly**: Clear output with emojis and formatting
+
+### ✅ Requirement 5: File Transfer & Desktop Integration
+- **Implemented**: `download_picture()` and `take_and_download()` functions
+- **Features**: Automatic desktop save location with timestamp naming
+- **Security**: Path validation to prevent directory traversal attacks
+- **User Experience**: One-command photo capture and download functionality
 
 ## 🎯 Best Practices Implemented
 
@@ -489,7 +509,7 @@ Potential improvements for future versions:
 
 - **Authentication**: Add token-based authentication
 - **Video Recording**: Support for video recording
-- **File Transfer**: Download captured images to control computer
+- ✅ **File Transfer**: ~~Download captured images to control computer~~ **IMPLEMENTED** - Now supports `take_and_download` with automatic desktop saving
 - **Multiple Commands**: Batch command execution
 - **WebSocket**: Real-time communication
 - **Device Discovery**: Automatic device discovery on network
@@ -571,7 +591,7 @@ Python Side:
 
 ### **Advanced Features:**
 - **Video Recording** - Camera extension
-- **File Transfer** - Data exchange
+- ✅ **File Transfer** - **IMPLEMENTED** (Data exchange with desktop download)
 - **Device Discovery** - Network scanning
 - **Web Dashboard** - Browser interface
 - **Real-time Monitoring** - Live status updates
@@ -634,7 +654,10 @@ python --version
 python remote_control.py 10.100.102.126 status
 
 ## 🎯 **What You'll See When It Works**
-C:\android_remote> python remote_control.py 10.100.102.126 status:
+
+**Status Command:**
+```
+C:\android_remote> python remote_control.py 10.100.102.126 status
 
 🔗 Connected to device at http://10.100.102.126:8080
 📤 Sending command: {"action": "status"}
@@ -642,12 +665,25 @@ C:\android_remote> python remote_control.py 10.100.102.126 status:
 ✅ Server is running
 ```
 
+**Take and Download Command:**
+```
+C:\android_remote> python remote_control.py 10.100.102.126 take_and_download
+
+🔗 Connected to device at http://10.100.102.126:8080
+📸 Taking picture...
+✅ Picture captured: /storage/emulated/0/DCIM/Camera/IMG_20241215_143022_123.jpg
+⬇️ Downloading to desktop...
+✅ Downloaded: downloaded_20241215_143022_IMG_20241215_143022_123.jpg
+```
+
 ## 📁 File Handling
 
 - **Auto-naming**: If you don't specify a save path, files are automatically named with timestamps
 - **Desktop location**: Downloaded images are saved to your desktop by default
+- **One-command operation**: Use `take_and_download` to capture and download in a single command
 - **Size verification**: Downloads are verified to ensure complete transfer
 - **Progress feedback**: Clear status messages throughout the process
+- **Naming convention**: Downloaded files use format `downloaded_YYYYMMDD_HHMMSS_original_filename.jpg`
 
 ## ❌ **What You DON'T Need**
 - ❌ Android Studio
